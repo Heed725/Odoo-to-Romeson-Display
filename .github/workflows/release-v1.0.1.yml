@@ -1,0 +1,50 @@
+name: Publish v1.0.1 release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-v1.0.1.yml
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Publish release package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          if gh release view v1.0.1 >/dev/null 2>&1; then
+            gh release upload v1.0.1 \
+              releases/Romeson-Odoo-LED8-v1.0.1.zip \
+              docs/Romeson_Odoo_POS_LED8_Installation_Guide.docx \
+              --clobber
+          else
+            gh release create v1.0.1 \
+              releases/Romeson-Odoo-LED8-v1.0.1.zip \
+              docs/Romeson_Odoo_POS_LED8_Installation_Guide.docx \
+              --target "${GITHUB_SHA}" \
+              --title "Odoo POS to Romeson LED8 v1.0.1" \
+              --notes "First official release of the Odoo POS to Romeson LED8 customer display connector.
+
+          Included:
+          - Windows COM2 serial bridge configured for 2400 baud and LED8/ESC-POS commands.
+          - Microsoft Edge extension for Odoo POS.
+          - Automatic Windows startup installer.
+          - Test, start, stop, and uninstall scripts.
+          - Complete Word installation and troubleshooting guide.
+
+          Supported POS sites:
+          - https://stage.bahdela.or.tz/pos/ui/*
+          - https://erp.bahdela.co.tz/pos/ui/*
+          - https://*.odoo.com/pos/ui/*"
+          fi
