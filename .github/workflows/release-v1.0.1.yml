@@ -1,3 +1,4 @@
+# Official v1.0.1 release automation
 name: Publish v1.0.1 release
 
 on:
