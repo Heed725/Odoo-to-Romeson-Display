@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Odoo POS to Romeson LED8",
+  "version": "2.0.0",
+  "description": "Sends the visible total from any standard Odoo POS instance to a local Romeson LED8 customer display.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "http://127.0.0.1:8765/*",
+    "http://*/pos/ui*",
+    "https://*/pos/ui*"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/pos/ui*",
+        "https://*/pos/ui*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "Romeson LED8",
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "odoo-romeson-led8@heed725",
+      "strict_min_version": "109.0"
+    }
+  }
+}
