@@ -1,14 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Odoo POS to Romeson LED8",
-  "version": "1.0.1",
-  "description": "Sends the visible Odoo POS total to a local Romeson LED8 customer display.",
+  "version": "2.0.0",
+  "description": "Sends the visible total from any standard Odoo POS instance to a local Romeson LED8 customer display.",
   "permissions": ["storage"],
   "host_permissions": [
-    "https://*.odoo.com/*",
-    "https://stage.bahdela.or.tz/*",
-    "https://erp.bahdela.co.tz/*",
-    "http://127.0.0.1:8765/*"
+    "http://127.0.0.1:8765/*",
+    "http://*/pos/ui*",
+    "https://*/pos/ui*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -16,9 +15,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://*.odoo.com/pos/ui/*",
-        "https://stage.bahdela.or.tz/pos/ui/*",
-        "https://erp.bahdela.co.tz/pos/ui/*"
+        "http://*/pos/ui*",
+        "https://*/pos/ui*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
