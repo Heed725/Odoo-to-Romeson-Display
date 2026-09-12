@@ -1,0 +1,48 @@
+name: Publish v2.0.0 release
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/release-v2.0.0.yml
+      - extension/**
+      - extension-firefox/**
+      - bridge/**
+      - "*.bat"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build cross-browser Windows package
+        shell: bash
+        run: |
+          package="Romeson-Odoo-LED8-v2.0.0"
+          mkdir -p "dist/$package"
+          cp -R bridge extension extension-firefox "dist/$package/"
+          cp install.bat start-bridge.bat stop-bridge.bat test-display.bat uninstall.bat README.md "dist/$package/"
+          cd dist
+          zip -r "$package.zip" "$package"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          asset="dist/Romeson-Odoo-LED8-v2.0.0.zip"
+          if gh release view v2.0.0 >/dev/null 2>&1; then
+            gh release upload v2.0.0 "$asset" --clobber
+          else
+            gh release create v2.0.0 "$asset" \
+              --target "${GITHUB_SHA}" \
+              --title "Odoo POS to Romeson LED8 v2.0.0" \
+              --notes "Cross-browser release for Microsoft Edge, Google Chrome, and Mozilla Firefox. Supports the standard /pos/ui route on any HTTP or HTTPS Odoo host. Includes the Windows Romeson LED8 serial bridge and installer."
+          fi
