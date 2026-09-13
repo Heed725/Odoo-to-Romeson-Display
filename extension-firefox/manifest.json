@@ -10,7 +10,7 @@
     "https://*/pos/ui*"
   ],
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"]
   },
   "content_scripts": [
     {
@@ -25,5 +25,11 @@
   "action": {
     "default_title": "Romeson LED8",
     "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "odoo-romeson-led8@heed725",
+      "strict_min_version": "109.0"
+    }
   }
 }

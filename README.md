@@ -1,14 +1,25 @@
 # Odoo POS to Romeson LED8 Customer Display
 
-Connect an Odoo Point of Sale session running in Microsoft Edge to a Romeson eight-digit rear customer display on Windows.
+Connect a standard Odoo Point of Sale session running in Microsoft Edge, Google Chrome, or Mozilla Firefox to a Romeson eight-digit rear customer display on Windows.
 
 The connector reads the visible numeric order total from Odoo POS, sends it to a local Windows bridge, and writes the LED8/ESC-POS byte sequence to `COM2` at `2400` baud.
 
-## Supported Odoo POS sites
+## Browser and Odoo compatibility
 
-- `https://stage.bahdela.or.tz/pos/ui/*`
-- `https://erp.bahdela.co.tz/pos/ui/*`
-- `https://*.odoo.com/pos/ui/*`
+Version 2.0 removes the fixed website list. It activates on the standard Odoo POS route on **any HTTP or HTTPS host**:
+
+- `http://<any-host>/pos/ui...`
+- `https://<any-host>/pos/ui...`
+
+This includes Odoo Online, Odoo.sh, locally hosted Odoo, IP-address installations, and custom domains. The supplied builds support:
+
+| Browser | Extension folder |
+|---|---|
+| Microsoft Edge | `extension/` |
+| Google Chrome | `extension/` |
+| Mozilla Firefox | `extension-firefox/` |
+
+The total reader supports standard Odoo POS layouts and common layouts used by Odoo 14 through current releases. A heavily customized POS theme can still require an additional CSS selector.
 
 ## Confirmed hardware configuration
 
@@ -24,10 +35,10 @@ The connector reads the visible numeric order total from Odoo POS, sends it to a
 ## How it works
 
 ```text
-Odoo POS in Edge
+Odoo POS in Edge, Chrome, or Firefox
        |
        v
-Edge extension reads the visible numeric total
+Browser extension reads the visible numeric total
        |
        v
 Local Windows bridge on 127.0.0.1:8765
@@ -41,18 +52,35 @@ Romeson LED8 customer display
 
 Only the numeric total is sent to the local bridge. Product names, customer details, passwords, and payment information are not transmitted.
 
-## Quick installation
+## Installation
 
-1. Download `releases/Romeson-Odoo-LED8-v1.0.1.zip`.
-2. Extract the ZIP to a normal Windows folder.
-3. Right-click `install.bat` and select **Run as administrator**.
-4. Open `edge://extensions` in Microsoft Edge.
-5. Enable **Developer mode**.
-6. Click **Load unpacked**.
-7. Select `%LOCALAPPDATA%\RomesonOdooBridge\extension`.
-8. Pin **Odoo POS to Romeson LED8**.
-9. Click the extension and choose **Test 25,000.00**.
-10. Open an Odoo POS session and add a product.
+1. Download or clone this repository.
+2. Right-click `install.bat` and select **Run as administrator**.
+3. Load the correct extension folder for your browser.
+4. Restart the Odoo POS page.
+5. Pin the extension and choose **Test 25,000.00**.
+
+### Microsoft Edge
+
+1. Open `edge://extensions`.
+2. Enable **Developer mode**.
+3. Click **Load unpacked**.
+4. Select `%LOCALAPPDATA%\RomesonOdooBridge\extension`.
+
+### Google Chrome
+
+1. Open `chrome://extensions`.
+2. Enable **Developer mode**.
+3. Click **Load unpacked**.
+4. Select `%LOCALAPPDATA%\RomesonOdooBridge\extension`.
+
+### Mozilla Firefox
+
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Click **Load Temporary Add-on**.
+3. Select `%LOCALAPPDATA%\RomesonOdooBridge\extension-firefox\manifest.json`.
+
+A temporary Firefox add-on must be loaded again after Firefox restarts. Permanent normal-Firefox installation requires a Mozilla-signed package or enterprise deployment policy.
 
 The bridge starts automatically when the Windows user signs in.
 
@@ -74,9 +102,10 @@ powershell -Command "$p=New-Object System.IO.Ports.SerialPort 'COM2',2400,'None'
 
 ```text
 bridge/                          Windows serial bridge
-extension/                       Microsoft Edge extension
-docs/                            Word installation guide
-releases/                        Ready-to-install ZIP package
+extension/                       Edge and Chrome extension
+extension-firefox/               Firefox extension
+docs/                            Installation documentation
+releases/                        Ready-to-install release packages
 install.bat                      Installer and automatic startup setup
 start-bridge.bat                 Manual bridge start
 stop-bridge.bat                  Manual bridge stop
@@ -87,14 +116,13 @@ uninstall.bat                    Connector removal helper
 ## Troubleshooting
 
 - **Extension says Not connected:** run `start-bridge.bat`.
+- **Nothing happens on a self-hosted instance:** confirm its POS URL contains `/pos/ui`, then reload the extension and the POS page.
 - **Access to COM2 is denied:** close other applications using COM2, then restart the bridge.
 - **Corrupted symbols:** restart the display and confirm it is using 2400 baud.
-- **CLI works but Odoo does not:** confirm the Edge extension is loaded and the URL contains `/pos/ui/`.
+- **Test works but Odoo does not:** the POS may use a customized total element; add its selector to `content.js`.
 - **Diagnostic status:** open `http://127.0.0.1:8765/health`.
 - **Log file:** `%LOCALAPPDATA%\RomesonOdooBridge\bridge.log`.
 
-See [the complete Word installation guide](docs/Romeson_Odoo_POS_LED8_Installation_Guide.docx) for detailed setup, validation, updating, and uninstallation instructions.
-
 ## Version
 
-Current release: **1.0.1**
+Development version: **2.0.0**
